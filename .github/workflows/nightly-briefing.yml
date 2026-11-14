@@ -1,0 +1,32 @@
+name: Nightly crypto briefing
+
+on:
+  schedule:
+    - cron: "0 21 * * *"          # 21:00 = 9 PM, every day
+      timezone: "Asia/Kolkata"     # change to YOUR time zone
+  workflow_dispatch:               # adds a "Run workflow" button for testing
+
+jobs:
+  briefing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Write and send the briefing
+        run: python main.py
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          TIMEZONE: ${{ vars.TIMEZONE }}
